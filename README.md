@@ -10,3 +10,19 @@ Instructions are pretty much as are stated in `https://github.com/mknoxnv/ubuntu
 - `slurm.conf`
 - `slurmdbd.conf`
 - enable cgroup memory (`/boot/cmdline.txt`)
+
+## Multi-node:
+- set `master` and `worker` hostnames in `/etc/hosts`
+- copy the `munge.key` of `master` node into the 'workder' nodes 
+- enable and start `slurmd` on `worker` nodes
+- same `slurm.conf` between all nodes
+
+Check nodes:
+```
+sinfo
+srun -n5 hostname
+```
+Update the states of a node:
+```
+scontrol update nodename=node02 state=idle
+```

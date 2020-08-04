@@ -16,6 +16,7 @@ Instructions are pretty much as are stated in `https://github.com/mknoxnv/ubuntu
 - copy the `munge.key` of `master` node into the 'workder' nodes 
 - enable and start `slurmd` on `worker` nodes
 - same `slurm.conf` between all nodes
+- NFS from the master to all worker nodes
 
 Check nodes:
 ```
@@ -26,3 +27,10 @@ Update the states of a node:
 ```
 scontrol update nodename=node02 state=idle
 ```
+
+## NFS:
+`/home` and `/storage` have to be mounted from the master. If automatic mounting in `fastb` doesn't work try:
+```
+sudo raspi-config
+```
+and selecting Wait for network at boot/Yes.

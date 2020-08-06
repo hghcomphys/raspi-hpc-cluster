@@ -21,7 +21,7 @@ Instructions are pretty much as are stated in `https://github.com/mknoxnv/ubuntu
 Check nodes:
 ```
 sinfo
-srun -n5 hostname
+srun --nodes=2 hostname
 ```
 Update the states of a node:
 ```
@@ -43,3 +43,25 @@ Module and packages can be built on master nodes and shared through NFS to other
 Logging node is in fact a `worker node` that is not used in any of `partitions`. This allows users to remotely connect, through ssh, and submit jobs.
 
 It can be configured by simply removing the login node's hostname from partition nodes of the `slurm.conf` file. 
+
+## Setup Jupyterhub:
+Conda or Miniconda, at this moment, does not support jupyterhub installation on raspberry pi. Therefore, it requires to directly install it from `apt-get python3-pip` and `pip3` commands.
+
+How to install jupyterhub on `raspbian 64bit`:
+```
+sudo apt-get update 
+sudo apt-get install python3-pip 
+sudo -H pip3 install --upgrade pip
+
+sudo apt-get install npm 
+sudo npm install -g configurable-http-proxy
+
+sudo install libffi-dev
+sudo -H pip3 install notebook jupyterhub
+```
+
+`master` node: jupyterhub and its config file (see `jupyterhub_config.py`) has to be setup file. Also `batchspawner` and `wrapspawner` for its integration with Slurm has to install from their git repos. 
+
+Master node is the place where jupyterhub service runs and then users access the service through the preset jupyterhub `ip` and `port` in the config file.
+
+`worker` node: only `notebook` and `batchspawner` are required. If it does not work, install `jupyterhub` and `wrapspawner` packages as well.

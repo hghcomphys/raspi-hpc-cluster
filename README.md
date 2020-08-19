@@ -1,6 +1,8 @@
 # Raspberry-Pi cluster
 The aim of this repo is to setup a test raspberry pi cluster for HPC purposes.
 
+![Raspberry Pi cluster](docs/raspi_cluster.png)
+
 ## Currently:
 - [SLURM](https://github.com/SchedMD/slurm) version `20.02` workload manager was built from source code and was successfully tested on `Raspbian Buster 64bit` 
 - Infrastructure (`Raspberry Pi 4 2GB`): 

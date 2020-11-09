@@ -111,3 +111,25 @@ python3 -m ipykernel install --name newenv --display-name "New Env"
 
 Modify the `argv` key in `/usr/local/share/jupyter/kernels/newenv/kernel.json` and set the python path to the just created environment which is `/nfs/envs/newenv/bin/python`. New kernel is now visible in the list of notebooks for all nodes without any need to restart the jupyterhub service.
 
+### Disk Quota
+First install `quota` using apt and add `usrquoata` and `grpquota` for `/etc/fstab`
+see [here](https://linuxhint.com/disk_quota_ubuntu/) and [here](https://docs.oracle.com/cd/E19455-01/805-7229/6j6q8svfg/index.html#sysresquotas-82495) for more details.
+
+if you confront the ` Cannot stat() mounted device /dev/root` then linked the partition as
+```
+lsblk 
+ln -s /dev/mmcblk0p2 /dev/root
+quotacheck -cum /
+quotacheck -cgm /
+quotaon -v /
+repquota -a
+```
+How to set soft and hard limit for an user:
+```
+edquota user1
+repquota -a
+```
+each `blocksize` in linux system by default is `1KB`.
+even NFS exported dirs respect quota if UIDs and GIDs remain consistent accros nodes.
+But a better solution is to configure NFS-server to take into account exported dirs for clients.
+

@@ -133,3 +133,40 @@ each `blocksize` in linux system by default is `1KB`.
 even NFS exported dirs respect quota if UIDs and GIDs remain consistent accros nodes.
 But a better solution is to configure NFS-server to take into account exported dirs for clients.
 
+### Slurm PAM
+This is used to limit/prevent users direct access to the compute nodes.
+On each compute node you should copy pam_slurm.so to linux kernel security directory and add extra config to `/etc/pamd.d/sshd` file.
+```
+cp /nfs/slurm-20/contribs/pam/.libs/pam_slurm.so /lib/aarch64-linux-gnu/security/
+vi /etc/pam.d/sshd
+account    required     /lib/aarch64-linux-gnu/security/pam_slurm.so
+```
+Above settings allows ssh access only to those users who have an active job on the compute node.
+
+A better solution is to block all (unprivileged) users except a list of allowed users (e.g. admin) who can directly access compute nodes
+either having active jobs or not.
+To do so create an allowed users list in sshd directory
+```
+nano /etc/ssh/allowed_users
+root
+admin
+
+chmod 600 /etc/ssh/allowed_users
+``` 
+check file `/lib/aarch64-linux-gnu/security/pam_listfile.so`
+Then add following line __before__ `pam_slurm.so` config:
+```
+account    sufficient    pam_listfile.so item=user sense=allow file=/etc/ssh/allowed_users onerr=fail
+```
+How to check users access (let's say node02 has limited access):
+```
+$ ssh user2@node02
+Access denied!
+
+$ ssh user2@node01
+$ salloc -N 1 --mem=100mb -w node02
+$ srun hostname
+node02
+```
+But admin users have access no `node02`.
+See [here](https://slurm.schedmd.com/faq.html) for more details.

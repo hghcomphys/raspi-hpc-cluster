@@ -111,7 +111,7 @@ python3 -m ipykernel install --name newenv --display-name "New Env"
 
 Modify the `argv` key in `/usr/local/share/jupyter/kernels/newenv/kernel.json` and set the python path to the just created environment which is `/nfs/envs/newenv/bin/python`. New kernel is now visible in the list of notebooks for all nodes without any need to restart the jupyterhub service.
 
-### Disk Quota
+## Disk Quota
 First install `quota` using apt and add `usrquoata` and `grpquota` for `/etc/fstab`
 see [here](https://linuxhint.com/disk_quota_ubuntu/) and [here](https://docs.oracle.com/cd/E19455-01/805-7229/6j6q8svfg/index.html#sysresquotas-82495) for more details.
 
@@ -133,7 +133,7 @@ each `blocksize` in linux system by default is `1KB`.
 even NFS exported dirs respect quota if UIDs and GIDs remain consistent accros nodes.
 But a better solution is to configure NFS-server to take into account exported dirs for clients.
 
-### Slurm PAM
+## Slurm PAM
 This is used to limit/prevent users direct access to the compute nodes.
 On each compute node you should copy pam_slurm.so to linux kernel security directory and add extra config to `/etc/pamd.d/sshd` file.
 ```
@@ -168,5 +168,88 @@ $ salloc -N 1 --mem=100mb -w node02
 $ srun hostname
 node02
 ```
-But admin users have access no `node02`.
-See [here](https://slurm.schedmd.com/faq.html) for more details.
+But admin users have access no `node02`. \
+See [here](https://slurm.schedmd.com/faq.html) for more details
+
+## Install Lmod
+Lmod is a Lua based environment module system that reads TCL modulefiles. \
+
+First install `lua` from source
+```
+$ wget https://sourceforge.net/projects/lmod/files/lua-5.1.4.9.tar.bz2
+$ tar xf lua-5.1.4.9.tar.bz2
+$ ./configure --prefix=/nfs/apps/lua/5.1.4.9
+$ make; make install
+$ cd /nfs/apps/lua; ln -s 5.1.4.9 lua
+$ ln -s /nfs/apps/lua/lua/bin/lua /usr/local/bin  # or add lua to PATH
+```
+
+Then install `Lmod`
+```
+$ wget https://sourceforge.net/projects/lmod/files/Lmod-8.4.tar.bz2
+$ tar xf Lmod-8.4.tar.bz2
+
+$ apt install tclsh lua-posix lua-term
+$ ./configure --prefix=/nfs/apps --with-fastTCLInterp=no
+$ make install
+```
+
+`Lmod` initialization script for the bash and zsh shells
+```angular2html
+$ ln -s /nfs/apps/lmod/lmod/init/profile        /etc/profile.d/z00_lmod.sh
+$ ln -s /nfs/apps/lmod/lmod/init/cshrc          /etc/profile.d/z00_lmod.csh
+```
+
+consider adding the following to `/etc/bash.bashrc`:
+```angular2html
+if ! shopt -q login_shell; then
+  if [ -d /etc/profile.d ]; then
+    for i in /etc/profile.d/*.sh; do
+      if [ -r $i ]; then
+        . $i
+      fi
+    done
+  fi
+fi
+```
+This is useful because non-login interactive shells only source `/etc/bash.bashrc` 
+and this file doesn’t normally source the files in `/etc/profile.d/*.sh`. \
+See [here](https://lmod.readthedocs.io/en/latest/030_installing.html) for more details
+
+### module file
+Sample lua module file `7.4.0.lua`
+```angular2html
+help([[
+This is the module file for the GCC compiler.
+]])
+
+local version = "7.4.0"
+
+whatis("Name: GCC compiler (system default)")
+whatis("Version: " .. version)
+whatis("Keywords: System, Compiler")
+whatis("URL: http://www.gnu.org/")
+whatis("Description: GNU compiler family")
+
+family("compiler")
+
+local prefix = "/usr/bin"
+
+setenv("CC",  pathJoin(prefix, "gcc-7"))
+setenv("CXX", pathJoin(prefix, "g++-7"))
+setenv("FC",  pathJoin(prefix, "fc"))
+setenv("C77", pathJoin(prefix, "fc"))
+
+local mroot = os.getenv("MODULEPATH_ROOT")
+local mdir = pathJoin(mroot, "GCC", version)
+prepend_path("MODULEPATH", mdir)
+
+```
+files structure
+```angular2html
+/nfs/apps/modulefiles
+└── Linux
+    └── GCC
+        ├── 7.4.0.lua
+        └── 8.3.0.lua
+```

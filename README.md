@@ -1,24 +1,33 @@
-# Raspberry-Pi cluster
-The aim of this repo is to setup a test raspberry pi cluster for HPC purposes.
+# Raspberry-Pi HPC cluster
+The aim for this repo is to setup a test raspberry pi HPC cluster.
 
 ![Raspberry Pi cluster](docs/raspi_cluster.png)
 
-## Currently:
-- [SLURM](https://github.com/SchedMD/slurm) version `20.02` workload manager was built from source code and was successfully tested on `Raspbian Buster 64bit` 
+## Features:
 - Infrastructure (`Raspberry Pi 4 2GB`): 
     - 1 master (hostname `node01`)
     - 1 compute node (hostname `node02`)
     - 0 login node
+    - 0 storage node
+- Raspberry Pi OS: `Raspbian Buster 64 bit`
+- [SLURM](https://github.com/SchedMD/slurm) workload manager (version `20.02` )
+- Network file share (NFS)
+- Batch job submission via CLI (SSH access)
+- [Jupyterhub](https://jupyter.org/hub) service integrated to `SLURM`
+- User and group disk quota
+- Environment module management ([Lmod](https://lmod.readthedocs.io/en/latest/))
 
-## Installation:
-Instructions are pretty much as are stated in `https://github.com/mknoxnv/ubuntu-slurm` except minor changes are required as follows:
+
+## Install SLURM:
+Instructions are pretty much as are stated in `https://github.com/mknoxnv/ubuntu-slurm` 
+except some changes are required as follows:
 - some prerequisite packages are different on `raspbian` (e.g. libmariadbclient)
 - `aarch64` architecture instead of `x86_64` (--enable-pam --with-pam_dir=/lib/aarch64-linux-gnu/security/
 - `slurm.conf`
 - `slurmdbd.conf`
 - enable cgroup memory (`/boot/cmdline.txt`)
 
-## Multi-node:
+### Nodes:
 - set `master` and `compute` node hostnames in `/etc/hosts`
 - copy the `munge.key` of `master` node into the 'compute' nodes 
 - enable and start `slurmd` on `compute` nodes
@@ -35,7 +44,14 @@ Update the states of a node:
 scontrol update nodename=node02 state=idle
 ```
 
-## Network file share (NFS):
+### Login node:
+`Login node` is required in order to limit, or even block, users access to master and compute nodes for security reasons. On the other side, users have to be able to test their codes and submit their jobs from the login node(s). 
+
+Logging node is in fact a `compute node` that is not used in any of `partitions`. This allows users to remotely connect, through ssh, and submit jobs.
+
+It can be configured by simply removing the login node's hostname from partition nodes of the `slurm.conf` file. 
+
+## Setup NFS:
 `/home` and `/nfs` have to be mounted from the master node. 
 
 on the moster, append bellow to `/etc/exports`:
@@ -58,14 +74,9 @@ and selecting __wait__ for the network at boot/Yes.
 
 Modules and python environments can be built on master nodes and shared through NFS to other compute nodes, such as `/nfs/envs`. So, other compute nodes execute them without the need to install them on each node separately.
 
-## Login node:
-`Login node` is required in order to limit, or even block, users access to master and compute nodes for security reasons. On the other side, users have to be able to test their codes and submit their jobs from the login node(s). 
 
-Logging node is in fact a `compute node` that is not used in any of `partitions`. This allows users to remotely connect, through ssh, and submit jobs.
 
-It can be configured by simply removing the login node's hostname from partition nodes of the `slurm.conf` file. 
-
-## Setup jupyterhub:
+## Install jupyterhub:
 Conda or Miniconda, at this moment, does not support jupyterhub installation on raspberry pi. Therefore, it requires to directly install it from `apt-get python3-pip` and `pip3` commands.
 
 It is recommended to install jupyterhub as a separate environment. For simplicity reason, we install it directly on `/use/local/` and call it without activating any environment. Nevertheless, jupyterhub loads different kernels, which are shared between all nodes, in order to manage different python environments.     
@@ -90,7 +101,7 @@ Master node is the place where jupyterhub service runs and then users access the
 `compute` node: only `notebook` and `batchspawner` are required.
 
 
-## Add jupyter kernels:
+### Add jupyter kernels:
 To have a list of different python kernels, we need to create separate environments using `virtualenv` and share them between all nodes using NFS directory (`/nfs/envs` directory for example). There is also need to share jupyterhub kernels directory (`/usr/local/share/jupyter/kernels/`) to let the jupyterhub knows how to load the kernel (see `kernel.json` file). Now, we can simply modify or create new python environments on the master node and have it loaded on compute nodes as well.
 
 If you face a problem in runninf the loaded kernel, try install `pip install ipykernel` inside the environment.
@@ -111,11 +122,11 @@ python3 -m ipykernel install --name newenv --display-name "New Env"
 
 Modify the `argv` key in `/usr/local/share/jupyter/kernels/newenv/kernel.json` and set the python path to the just created environment which is `/nfs/envs/newenv/bin/python`. New kernel is now visible in the list of notebooks for all nodes without any need to restart the jupyterhub service.
 
-## Disk Quota
-First install `quota` using apt and add `usrquoata` and `grpquota` for `/etc/fstab`
+## Install disk quota
+First install `quota` using apt and add `usrquoata` and `grpquota` for `/etc/fstab`. \
 see [here](https://linuxhint.com/disk_quota_ubuntu/) and [here](https://docs.oracle.com/cd/E19455-01/805-7229/6j6q8svfg/index.html#sysresquotas-82495) for more details.
 
-if you confront the ` Cannot stat() mounted device /dev/root` then linked the partition as
+if you confronted the ` Cannot stat() mounted device /dev/root` then linked the partition as
 ```
 lsblk 
 ln -s /dev/mmcblk0p2 /dev/root
@@ -133,7 +144,7 @@ each `blocksize` in linux system by default is `1KB`.
 even NFS exported dirs respect quota if UIDs and GIDs remain consistent accros nodes.
 But a better solution is to configure NFS-server to take into account exported dirs for clients.
 
-## Slurm PAM
+## Setup SLURM PAM
 This is used to limit/prevent users direct access to the compute nodes.
 On each compute node you should copy pam_slurm.so to linux kernel security directory and add extra config to `/etc/pamd.d/sshd` file.
 ```
@@ -216,7 +227,7 @@ This is useful because non-login interactive shells only source `/etc/bash.bashr
 and this file doesn’t normally source the files in `/etc/profile.d/*.sh`. \
 See [here](https://lmod.readthedocs.io/en/latest/030_installing.html) for more details
 
-### module file
+### Add module file
 Sample lua module file `7.4.0.lua`
 ```angular2html
 help([[

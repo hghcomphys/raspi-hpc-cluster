@@ -264,3 +264,14 @@ files structure
         ├── 7.4.0.lua
         └── 8.3.0.lua
 ```
+
+## OpenMPI
+You should build Open MPI with `--with-slurm` option (see [here](https://www.open-mpi.org/faq/?category=building)). 
+This allows Slurm managing reservations of communication ports for use by the Open MPI.
+
+```angular2html
+$ wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.0.tar.bz2 
+$ ./configure --with-slurm --prefix=/nfs/apps/modulefiles/Linux/OpenMPI/4.1.0
+$ ./make install all
+```
+It seems even slurm has to be built with `--with-pmix` switch!

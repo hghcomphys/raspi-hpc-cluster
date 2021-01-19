@@ -19,10 +19,16 @@ The aim for this repo is to setup a test raspberry pi HPC cluster.
 
 
 ## Install SLURM:
-Instructions are pretty much as are stated in `https://github.com/mknoxnv/ubuntu-slurm` 
+Instructions are pretty much as are stated in [ubuntu-slurm](https://github.com/mknoxnv/ubuntu-slurm) 
 except some changes are required as follows:
 - some prerequisite packages are different on `raspbian` (e.g. libmariadbclient)
-- `aarch64` architecture instead of `x86_64` (--enable-pam --with-pam_dir=/lib/aarch64-linux-gnu/security/
+- configure slurm for `aarch64` architecture instead of `x86_64` 
+  - use `--with-pmi` if Slurm with Open MPI is intended
+  ```angular2html
+  ./configure --prefix=/tmp/slurm-build --sysconfdir=/etc/slurm --enable-pam --with-pam_dir=/lib/aarch64-linux-gnu/security/ --withhout-shared-libslurm --with-pmix
+  make
+  make install
+  ```
 - `slurm.conf`
 - `slurmdbd.conf`
 - enable cgroup memory (`/boot/cmdline.txt`)
@@ -254,9 +260,10 @@ setenv("C77", pathJoin(prefix, "fc"))
 local mroot = os.getenv("MODULEPATH_ROOT")
 local mdir = pathJoin(mroot, "GCC", version)
 prepend_path("MODULEPATH", mdir)
-
 ```
-files structure
+__Note__: It is better to install modules in separate directories (using --prefix) in order to avoid module conflicts.
+
+an example of module file structure:
 ```angular2html
 /nfs/apps/modulefiles
 └── Linux
@@ -265,13 +272,20 @@ files structure
         └── 8.3.0.lua
 ```
 
-## OpenMPI
+## MPI
+
+### Open Install MPI
 You should build Open MPI with `--with-slurm` option (see [here](https://www.open-mpi.org/faq/?category=building)). 
 This allows Slurm managing reservations of communication ports for use by the Open MPI.
-
 ```angular2html
 $ wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.0.tar.bz2 
-$ ./configure --with-slurm --prefix=/nfs/apps/modulefiles/Linux/OpenMPI/4.1.0
+$ ./configure --with-slurm=/user --prefix=/nfs/apps/OpenMPI/4.1.0
 $ ./make install all
 ```
-It seems even slurm has to be built with `--with-pmix` switch!
+Additionally, Slurm has to be built with `--with-pmix` (see [here](https://slurm.schedmd.com/mpi_guide.html)) \
+_Note:_ Open MPI version 1.5!
+
+### MPICH
+```angular2html
+ ./configure --with-slurm=/usr --with-pmi=pmi --prefix=/nfs/apps/MPICH/3.4 --with-device=ch3:nemesis
+```

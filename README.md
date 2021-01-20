@@ -272,20 +272,36 @@ an example of module file structure:
         └── 8.3.0.lua
 ```
 
-## MPI
+## Install MPI
+list available MPI types in your current slurm installation 
+```
+$ srun --mpi=list
+```
+There should be `pmi` and/or `pmi2`.
 
-### Open Install MPI
+### Open MPI
 You should build Open MPI with `--with-slurm` option (see [here](https://www.open-mpi.org/faq/?category=building)). 
 This allows Slurm managing reservations of communication ports for use by the Open MPI.
+
+But first you need to make install pmi include and lib files in `slurm/contribs/pmi` and `slurm/contribs/pmi2`. 
+Then, the required files are available in `slurm-build` directories (e.g. in `/tmp` or `/opt`)
+
 ```angular2html
 $ wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.0.tar.bz2 
-$ ./configure --with-slurm=/user --prefix=/nfs/apps/OpenMPI/4.1.0
+$ tar xf openmpi-4.1.0.tar.bz2 
+$ ./configure --prefix=/nfs/apps/OpenMPI/3.1.1 --with-slurm=/usr --with-pmi=/tmp/slurm-build
 $ ./make install all
 ```
-Additionally, Slurm has to be built with `--with-pmix` (see [here](https://slurm.schedmd.com/mpi_guide.html)) \
-_Note:_ Open MPI version 1.5!
+Additionally, Slurm has to be built with `--with-pmix` (see [here](https://slurm.schedmd.com/mpi_guide.html) and [here](https://wiki.fysik.dtu.dk/niflheim/SLURM)) \
+_Note:_ Open MPI version `1.5` or `2.1.6`!
 
 ### MPICH
 ```angular2html
  ./configure --with-slurm=/usr --with-pmi=pmi --prefix=/nfs/apps/MPICH/3.4 --with-device=ch3:nemesis
 ```
+
+How to test
+```angular2html
+srun -n 4 --mpi=pmi2 a.out
+``` 
+or set 'MPIDefault=pmi2' in `slurm.conf`.

@@ -17,18 +17,28 @@ The aim for this repo is to setup a test raspberry pi HPC cluster.
 - User and group disk quota
 - Environment module management ([Lmod](https://lmod.readthedocs.io/en/latest/))
 
+### Users:
+- pi/testpass
+- admin/adminpass
 
 ## Install SLURM:
 Instructions are pretty much as are stated in [ubuntu-slurm](https://github.com/mknoxnv/ubuntu-slurm) 
 except some changes are required as follows:
 - some prerequisite packages are different on `raspbian` (e.g. libmariadbclient)
-- configure slurm for `aarch64` architecture instead of `x86_64` 
-  - use `--with-pmi` if Slurm with Open MPI is intended
+- configure and install slurm for `aarch64` architecture instead of `x86_64` \
+  _Note 1:_ use `--with-pmi` if slurm integration with MPI is intended \
+  _Note 2:_ `make install` pmi include/lib files in `slurm/contribs` before `fpg` command (therefore pmi files will be insttaled later at `/usr`)
   ```angular2html
-  ./configure --prefix=/tmp/slurm-build --sysconfdir=/etc/slurm --enable-pam --with-pam_dir=/lib/aarch64-linux-gnu/security/ --withhout-shared-libslurm --with-pmix
+  ./configure --prefix=/nfs/apps/slurm-build --sysconfdir=/etc/slurm --enable-pam --with-pam_dir=/lib/aarch64-linux-gnu/security/ --without-shared-libslurm --with-pmix
   make
+  make contrib 
   make install
+  cd ..
+  $ fpm -s dir -t deb -v 1.0 -n slurm-20.02 --prefix=/usr -C /nfs/apps/slurm-build .
+  $ dpkg -i slurm-20.02_1.0_arm64.deb
   ```
+
+  
 - `slurm.conf`
 - `slurmdbd.conf`
 - enable cgroup memory (`/boot/cmdline.txt`)
@@ -276,32 +286,37 @@ an example of module file structure:
 list available MPI types in your current slurm installation 
 ```
 $ srun --mpi=list
+srun: MPI types are...
+srun: pmi2
+srun: none
+srun: cray_shasta
 ```
 There should be `pmi` and/or `pmi2`.
+
+Slurm has to be built with `--with-pmix` (see [here](https://slurm.schedmd.com/mpi_guide.html) and [here](https://wiki.fysik.dtu.dk/niflheim/SLURM)) 
 
 ### Open MPI
 You should build Open MPI with `--with-slurm` option (see [here](https://www.open-mpi.org/faq/?category=building)). 
 This allows Slurm managing reservations of communication ports for use by the Open MPI.
 
-But first you need to make install pmi include and lib files in `slurm/contribs/pmi` and `slurm/contribs/pmi2`. 
-Then, the required files are available in `slurm-build` directories (e.g. in `/tmp` or `/opt`)
+But first you need to `make install` pmi in `slurm/contribs/pmi` and `slurm/contribs/pmi2`. 
+Then, the required include and lib files are available in `slurm-build` directories.
 
+Build OpenMPI with `slurm` and `pmi` using:
 ```angular2html
 $ wget https://download.open-mpi.org/release/open-mpi/v4.1/openmpi-4.1.0.tar.bz2 
 $ tar xf openmpi-4.1.0.tar.bz2 
-$ ./configure --prefix=/nfs/apps/OpenMPI/3.1.1 --with-slurm=/usr --with-pmi=/tmp/slurm-build
-$ ./make install all
-```
-Additionally, Slurm has to be built with `--with-pmix` (see [here](https://slurm.schedmd.com/mpi_guide.html) and [here](https://wiki.fysik.dtu.dk/niflheim/SLURM)) \
-_Note:_ Open MPI version `1.5` or `2.1.6`!
-
-### MPICH
-```angular2html
- ./configure --with-slurm=/usr --with-pmi=pmi --prefix=/nfs/apps/MPICH/3.4 --with-device=ch3:nemesis
+$  ./configure --prefix=/nfs/apps/OpenMPI/4.1.0 --with-slurm=/usr --with-pmi=/nfs/apps/slurm-build
+$ make install all
 ```
 
-How to test
+How to test MPI integration 
 ```angular2html
-srun -n 4 --mpi=pmi2 a.out
+module load OpenMPI
+srun -n 4 --mpi=pmi2 mpi_example.x
+Hello world from processor node01, rank 0 out of 4 processors
+Hello world from processor node01, rank 1 out of 4 processors
+Hello world from processor node01, rank 2 out of 4 processors
+Hello world from processor node01, rank 3 out of 4 processors
 ``` 
-or set 'MPIDefault=pmi2' in `slurm.conf`.
+Or set `MPIDefault=pmi2` in `slurm.conf` to use  `srun` without `--mpi=pmi2` flag.

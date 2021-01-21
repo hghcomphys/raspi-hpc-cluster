@@ -26,7 +26,7 @@ Instructions are pretty much as are stated in [ubuntu-slurm](https://github.com/
 except some changes are required as follows:
 - some prerequisite packages are different on `raspbian` (e.g. libmariadbclient)
 - configure and install slurm for `aarch64` architecture instead of `x86_64` \
-  _Note 1:_ use `--with-pmi` if slurm integration with MPI is intended \
+  _Note 1:_ use `--with-pmix` if slurm integration with MPI is intended \
   _Note 2:_ `make install` pmi include/lib files in `slurm/contribs` before `fpg` command (therefore pmi files will be insttaled later at `/usr`)
   ```angular2html
   ./configure --prefix=/nfs/apps/slurm-build --sysconfdir=/etc/slurm --enable-pam --with-pam_dir=/lib/aarch64-linux-gnu/security/ --without-shared-libslurm --with-pmix
@@ -37,8 +37,6 @@ except some changes are required as follows:
   $ fpm -s dir -t deb -v 1.0 -n slurm-20.02 --prefix=/usr -C /nfs/apps/slurm-build .
   $ dpkg -i slurm-20.02_1.0_arm64.deb
   ```
-
-  
 - `slurm.conf`
 - `slurmdbd.conf`
 - enable cgroup memory (`/boot/cmdline.txt`)
@@ -207,8 +205,9 @@ $ wget https://sourceforge.net/projects/lmod/files/lua-5.1.4.9.tar.bz2
 $ tar xf lua-5.1.4.9.tar.bz2
 $ ./configure --prefix=/nfs/apps/lua/5.1.4.9
 $ make; make install
-$ cd /nfs/apps/lua; ln -s 5.1.4.9 lua
+$ cd /nfs/apps/lua; ln -s 5.1.4.9 lua; ln -s 5.1.4.9 luac
 $ ln -s /nfs/apps/lua/lua/bin/lua /usr/local/bin  # or add lua to PATH
+$ ln -s /nfs/apps/lua/lua/bin/luac /usr/local/bin
 ```
 
 Then install `Lmod`
@@ -226,6 +225,7 @@ $ make install
 $ ln -s /nfs/apps/lmod/lmod/init/profile        /etc/profile.d/z00_lmod.sh
 $ ln -s /nfs/apps/lmod/lmod/init/cshrc          /etc/profile.d/z00_lmod.csh
 ```
+_Note:_ for other nodes, simply making above links at `/etc/profile.d/` would be sufficient.
 
 consider adding the following to `/etc/bash.bashrc`:
 ```angular2html
@@ -271,7 +271,8 @@ local mroot = os.getenv("MODULEPATH_ROOT")
 local mdir = pathJoin(mroot, "GCC", version)
 prepend_path("MODULEPATH", mdir)
 ```
-__Note__: It is better to install modules in separate directories (using --prefix) in order to avoid module conflicts.
+_Note_: It is better to install modules in separate directories (using --prefix) in order to avoid module conflicts. \
+Example can be seen [here](https://www.ivofilot.nl/posts/view/23/How+to+install+and+use+the+environment+modules+system)  
 
 an example of module file structure:
 ```angular2html

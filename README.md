@@ -1,5 +1,5 @@
 # Raspberry-Pi HPC cluster
-The aim for this repo is to setup a test but scalable HPC cluster using Raspberry Pi microcontrollers.
+The aim for this repo is to show steps on how to setup a test but scalable HPC cluster using Raspberry Pi microcontrollers.
 
 ![Raspberry Pi cluster](docs/raspi_cluster.png)
 
@@ -23,7 +23,7 @@ The aim for this repo is to setup a test but scalable HPC cluster using Raspberr
 - pi/testpass
 - admin/adminpass
 
-## Install SLURM:
+## SLURM:
 Instructions are pretty much as are stated in [ubuntu-slurm](https://github.com/mknoxnv/ubuntu-slurm) 
 except some changes which are required as follows:
 - some prerequisite packages are different on `raspbian` (e.g. libmariadbclient)

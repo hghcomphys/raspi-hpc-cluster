@@ -1,25 +1,34 @@
-# Raspberry-Pi HPC cluster
-The aim for this repo is to setup a test raspberry pi HPC cluster.
+# Raspberry-Pi HPC Cluster
+This repo shows steps to setup a __test__ but __scalable__ Raspberry Pi cluster for high-performance computing (HPC). The experiences learned from this help you to build your real HPC cluster which support both interactive and command line modes.
+
 
 ![Raspberry Pi cluster](docs/raspi_cluster.png)
 
 ## Features:
-- Infrastructure (`Raspberry Pi 4 2GB`): 
-    - 1 master (hostname `node01`)
-    - 1 compute node (hostname `node02`)
-    - 0 login node
-    - 0 storage node
 - Raspberry Pi OS: `Raspbian Buster 64 bit`
 - [SLURM](https://github.com/SchedMD/slurm) workload manager (version `20.02` )
 - Network file share (NFS)
-- Batch job submission via CLI (SSH access)
-- [Jupyterhub](https://jupyter.org/hub) service integrated to `SLURM`
+- Batch job submission via - CLI mode
+- [Jupyterhub](https://jupyter.org/hub) service integrated to `SLURM` - Interactive mode
 - User and group disk quota
 - Environment module management ([Lmod](https://lmod.readthedocs.io/en/latest/))
 
-### Users:
-- pi/testpass
-- admin/adminpass
+
+<!-- Table of content here! -->
+
+## Infrastructure 
+Board: `Raspberry Pi 4 model B 2GB`: 
+  - 1 master (hostname `node01`)
+  - 1 compute node (hostname `node02`)
+  - 0 login node
+  - 0 storage node
+
+
+## Users 
+(username/password):
+- `pi` / `testpass`
+- `admin` / `adminpass`
+
 
 ## Install SLURM:
 Instructions are pretty much as are stated in [ubuntu-slurm](https://github.com/mknoxnv/ubuntu-slurm) 

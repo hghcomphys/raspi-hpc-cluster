@@ -1,7 +1,8 @@
 # Raspberry-Pi HPC Cluster
 This repo shows steps to setup a __test__ but __scalable__ Raspberry Pi cluster for high-performance computing (HPC). The experiences learned from this help you to build your real HPC cluster which support both interactive and command line modes.
 
-![Raspberry Pi cluster](docs/raspi_cluster.png)
+<!-- ![Raspberry Pi cluster](docs/raspi_cluster.JPG) -->
+<img src="docs/raspi_cluster.JPG" alt="drawing" width="600"/>
 
 ## Main Features
 - Raspberry Pi OS: `Raspbian Buster 64 bit`

@@ -1,5 +1,5 @@
 # Raspberry-Pi HPC Cluster
-This repo shows steps to setup a __test__ but __scalable__ Raspberry Pi cluster for high-performance computing (HPC). The experiences learned from this help you to build your real HPC cluster which support both interactive and command line modes.
+This repo shows steps to setup a __test__ but __scalable__ _Raspberry Pi cluster_ for high-performance computing (HPC). The experiences learned from this help you to build your real HPC cluster which support both interactive and command line modes.
 
 <!-- ![Raspberry Pi cluster](docs/raspi_cluster.JPG) -->
 <img src="docs/raspi_cluster.JPG" alt="drawing" width="600"/>
@@ -64,7 +64,7 @@ except some changes which are required as follows:
 - copy the `munge.key` of the `master` node to the `compute` nodes 
 - enable and start `slurmd` on `compute` nodes
 - same `slurm.conf` between all nodes
-- NFS from master to all compute nodes
+- export NFS from master to all compute nodes
 
 Check nodes:
 ```

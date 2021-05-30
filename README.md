@@ -1,23 +1,23 @@
 # Raspberry-Pi HPC Cluster
-This repo shows steps to setup a __test__ but __scalable__ _Raspberry Pi cluster_ for high-performance computing (HPC). The experiences learned from this help you to build your real HPC cluster which support both interactive and command line modes.
+This repo shows steps on how to setup a __test__ but __scalable__  high-performance computing (HPC) cluster using [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi) and with a focus on data science. The experiences learned from this tutorial are intended to hopefully help you to build your real HPC cluster, e.g. with hundreds of compute nodes, which support both interactive and command-line interface.
 
 <!-- ![Raspberry Pi cluster](docs/raspi_cluster.JPG) -->
 <img src="docs/raspi_cluster.JPG" alt="drawing" width="600"/>
 
-## Main Features
-- Raspberry Pi OS: `Raspbian Buster 64 bit`
-- [SLURM](https://github.com/SchedMD/slurm) workload manager (version `20.02` )
-- Network file share (NFS)
+## Features implemented
+- [Slurm](https://slurm.schedmd.com/overview.html) workload manager
 - Batch job submission
-- [Jupyterhub](https://jupyter.org/hub) service integrated to `SLURM`
+- [Jupyterhub](https://jupyter.org/hub) service integrated to Slurm
+- Network file share (NFS)
 - User and group disk quota
 - Conda package management for Python/R
-- Environment module management ([Lmod](https://lmod.readthedocs.io/en/latest/))
-- Support [MPI](https://www.open-mpi.org/) applications integrated with SLURM
+- Environment module management using [Lmod](https://lmod.readthedocs.io/en/latest/)
+- Support parallel [MPI](https://www.open-mpi.org/) applications integrated with Slurm
 
 
 ## Infrastructure 
-Board: `Raspberry Pi 4 model B 2GB`: 
+OS: `Raspbian Buster 64 bit` \
+Board: `Raspberry Pi 4 model B 2GB`
   - 1 master (hostname `node01`)
   - 1 compute node (hostname `node02`)
   - 0 login node
@@ -59,7 +59,7 @@ except some changes which are required as follows:
 - `slurmdbd.conf`
 - enable cgroup memory (`/boot/cmdline.txt`)
 
-## Nodes:
+## Nodes
 - set `master` and `compute` node hostnames in `/etc/hosts`
 - copy the `munge.key` of the `master` node to the `compute` nodes 
 - enable and start `slurmd` on `compute` nodes
@@ -76,7 +76,7 @@ Update the states of a node:
 $ scontrol update nodename=node02 state=idle
 ```
 
-### Login Node:
+### Login Node
 `Login node` is required in order to limit, or even block, users access to master and compute nodes for security reasons. On the other side, users have to be able to test their codes and submit their jobs from the login node(s). 
 
 The login node is in fact a `compute node` that is not used in any of `partitions`. This allows users to remotely connect, through ssh, and submit jobs.

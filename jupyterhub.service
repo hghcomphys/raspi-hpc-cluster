@@ -1,0 +1,13 @@
+[Unit]
+Description=JupyterHub Service
+After=multi-user.target
+
+[Service]
+User=root
+WorkingDirectory=/srv/jupyterhub
+ExecStart=/usr/local/bin/jupyterhub -f /srv/jupyterhub/jupyterhub_config.py
+Restart=on-failure
+RestartSec=10s
+
+[Install]
+WantedBy=multi-user.target

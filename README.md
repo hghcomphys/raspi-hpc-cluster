@@ -420,10 +420,10 @@ mpirun mpi_example.x  # mpirun works as well
 
 ## Snapshots
 
-<img src="docs/login.png" alt="drawing" width="500"/>
+<img src="docs/login.png" alt="drawing" width="600"/>
 
-<img src="docs/profile.png" alt="drawing" width="500"/>
+<img src="docs/profile.png" alt="drawing" width="600"/>
 
-<img src="docs/launcher.png" alt="drawing" width="500"/>
+<img src="docs/launcher.png" alt="drawing" width="600"/>
 
-<img src="docs/batch.png" alt="drawing" width="500"/>
+<img src="docs/batch.png" alt="drawing" width="600"/>

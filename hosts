@@ -1,0 +1,5 @@
+# ...
+
+192.168.0.100 rplogin01 rplogin01.local
+192.168.0.101 rpnode01 rpnode01.local
+192.168.0.102 rpnode02 rpnode02.local

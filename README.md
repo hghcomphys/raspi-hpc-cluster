@@ -1,37 +1,35 @@
 # Raspberry-Pi HPC Cluster
-
-This repository shows my attempt to on how to build a **test** but **scalable** high-performance computing (HPC) cluster that is suitable for data science using [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi).
-The experiences learned from this tutorial are intended to hopefully help you to build your own real HPC cluster, e.g. with hundreds of compute nodes, which support both interactive and command-line interfaces.
+In this repository, I document my endeavor to construct a scalable high-performance computing (HPC) cluster using [Raspberry Pi](https://en.wikipedia.org/wiki/Raspberry_Pi), specifically tailored for data science applications. 
+The knowledge gained from this tutorial aims to assist you in building your own functional HPC cluster, capable of accommodating hundreds of compute nodes, and supporting both web-based (e.g. jupyterhub) and command-line interfaces.
 
 <!-- ![Raspberry Pi cluster](docs/raspi_cluster.JPG) -->
 <img src="docs/raspi_cluster3.JPG" alt="drawing" width="500"/>
 
-## Features implemented
 
-- [Slurm](https://slurm.schedmd.com/overview.html) workload manager
-- Batch job submission
-- [Jupyterhub](https://jupyter.org/hub) service integrated to Slurm
-- Network file share (NFS)
-- User and group disk quota
-- Conda package management for Python/R
-- Environment module management using [Lmod](https://lmod.readthedocs.io/en/latest/)
-- Support parallel [MPI](https://www.open-mpi.org/) applications integrated with Slurm
+## Implemented Features
+- [Slurm](https://slurm.schedmd.com/overview.html) workload manager for efficient job management.
+- Batch job submission capabilities to facilitate scheduling and execution.
+- Integration of [JupyterHub](https://jupyter.org/hub) service with Slurm, enabling interactive notebook usage.
+- Network file sharing through NFS (Network File System).
+- Disk quota management for users and groups.
+- Conda package management for Python/R environments.
+- Environment module management facilitated by [Lmod](https://lmod.readthedocs.io/en/latest/).
+- Support for parallel MPI (Message Passing Interface) applications, integrated with Slurm.
+
 
 ## Infrastructure
-
-- ‌Board Raspberry Pi 3+ 1GB (`rplogin01`)
-  - login node
-  - jupyter node
-- ‌Board Raspberry Pi 4 model B 2GB (`rpnode01`)
-  - master node
-  - NFS storage node
-  - compute node
-- ‌Board Raspberry Pi 4 model B 2GB (`rpnode02`)
-  - compute node
+The infrastructure consists of the following components:
+- Raspberry Pi 3+ 1GB board (`rplogin01`)
+  - Functions as the login node and jupyter node.
+- Raspberry Pi 4 model B 2GB board (`rpnode01`)
+  - Serves as the master node, NFS storage node, and compute node.
+- Raspberry Pi 4 model B 2GB board (`rpnode02`)
+  - Operates as a compute node.
 - Ethernet switch
-- Usb power hub
+- USB power hub
 
-Operating system: `Raspbian Buster 64 bit`
+## Operating system
+Raspbian Buster 64 bit
 
 ## Test Users
 

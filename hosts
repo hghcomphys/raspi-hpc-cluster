@@ -1,5 +1,10 @@
-# ...
+127.0.0.1	localhost
+::1		localhost ip6-localhost ip6-loopback
+ff02::1		ip6-allnodes
+ff02::2		ip6-allrouters
 
-192.168.0.100 rplogin01 rplogin01.local
-192.168.0.101 rpnode01 rpnode01.local
-192.168.0.102 rpnode02 rpnode02.local
+127.0.1.1	rplogin01
+
+192.168.0.100 rplogin01 rplogin01.home.local
+192.168.0.101 rpnode01 rpnode01.home.local
+192.168.0.102 rpnode02 rpnode02.home.local

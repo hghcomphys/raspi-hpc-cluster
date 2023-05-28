@@ -1,0 +1,14 @@
+[Unit]
+Description=Filebrowser Service
+After=multi-user.target
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi
+ExecStart=/usr/local/bin/filebrowser -c .config/filebrowser/ -a 0.0.0.0 -r .
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

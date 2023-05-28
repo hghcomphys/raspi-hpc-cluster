@@ -1,0 +1,3 @@
+# ...
+rpnode01:/nfs /nfs nfs defaults 0 0
+rpnode01:/home /home nfs defaults 0 0
